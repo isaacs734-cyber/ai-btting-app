@@ -64,8 +64,15 @@ def players(search: str = "m"):
 
     return resultados
 @app.get("/value-picks")
-def value_picks():
-    jugadores = players("mbappe")
+def value_picks(search: str = "mbappe"):
+    jugadores = players(search)
+
+    if not jugadores:
+        return {
+            "error": "No se encontraron jugadores",
+            "busqueda": search,
+            "tip": "Prueba /players?search=mbappe"
+        }
 
     picks = []
 
