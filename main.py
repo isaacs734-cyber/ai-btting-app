@@ -4,21 +4,30 @@ import os
 
 app = FastAPI()
 
-API_KEY = os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17") or os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17")
-
 @app.get("/")
 def home():
     return {"status": "ok"}
 
+@app.get("/envcheck")
+def envcheck():
+    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
+
+    return {
+        "api_key_detectada": bool(api_key),
+        "variables_api": [k for k in os.environ.keys() if "API" in k or "KEY" in k]
+    }
+
 @app.get("/debug")
 def debug():
-    if not API_KEY:
+    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
+
+    if not api_key:
         return {"error": "API_KEY no está configurada en Railway"}
 
     url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
 
     headers = {
-        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Key": api_key,
         "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
     }
 
