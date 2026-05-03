@@ -45,31 +45,34 @@ def players(search: str = "mbappe"):
 
 @app.get("/top-picks")
 def top_picks(min_value: float = 1.08, limit: int = 10):
-    busquedas = [
-        "a", "m", "r", "s", "b", "c",
-        "haaland", "mbappe", "cristiano", "messi",
-        "vinicius", "salah", "kane", "bellingham"
-    ]
+    busquedas = ["a", "m", "r", "s", "haaland", "mbappe", "cristiano", "messi", "vinicius", "salah"]
 
     todos = []
 
     for nombre in busquedas:
-        picks = value_picks(nombre)
+        try:
+            picks = value_picks(nombre)
+            if isinstance(picks, list):
+                for pick in picks:
+                    if pick.get("value_score", 0) >= min_value:
+                        todos.append(pick)
+        except Exception:
+            continue
 
-        for pick in picks:
-            if pick["value_score"] >= min_value:
-                todos.append(pick)
-
-    # quitar duplicados por jugador
     unicos = {}
+
     for pick in todos:
-        jugador = pick["jugador"]
-        if jugador not in unicos or pick["value_score"] > unicos[jugador]["value_score"]:
+        jugador = pick.get("jugador")
+
+        if not jugador:
+            continue
+
+        if jugador not in unicos or pick.get("value_score", 0) > unicos[jugador].get("value_score", 0):
             unicos[jugador] = pick
 
     ordenados = sorted(
         unicos.values(),
-        key=lambda x: x["value_score"],
+        key=lambda x: x.get("value_score", 0),
         reverse=True
     )
 
