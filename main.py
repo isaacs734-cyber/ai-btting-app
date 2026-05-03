@@ -40,10 +40,10 @@ def debug():
     except Exception as e:
         return {"error": str(e)}
 @app.get("/players")
-def players():
+def players(search: str = "m"):
     api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
 
-    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
+    url = f"https://free-api-live-football-data.p.rapidapi.com/football-players-search?search={search}"
 
     headers = {
         "X-RapidAPI-Key": api_key,
@@ -63,7 +63,6 @@ def players():
         })
 
     return resultados
-
 @app.get("/picks")
 def picks():
     return {"message": "Backend funcionando. Usa /debug para probar la API."}
