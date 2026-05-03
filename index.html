@@ -88,20 +88,23 @@
 
         const data = await res.json();
         console.log(data);
+data.sort((a, b) => b.value_score - a.value_score);
+
+const filtered = data.filter(p => p.value_score >= 1.08);
 
         resultsDiv.innerHTML = "";
 
-        if (!Array.isArray(data) || data.length === 0) {
+        if (!Array.isArray(filtered) || filtered.length === 0) {
           resultsDiv.innerHTML = "<p>No hay resultados</p>";
           return;
         }
 
-        data.forEach(pick => {
+        filtered.forEach(pick => {
           let color = "value-low";
 
-          if (pick.value_score > 1.1) {
+          if (pick.value_score >= 1.18) {
             color = "value-high";
-          } else if (pick.value_score > 1.0) {
+          } else if (pick.value_score >= 1.08) {
             color = "value-mid";
           }
 
@@ -113,7 +116,7 @@
               <h3>${pick.mercado}</h3>
 
               <p>📊 Probabilidad: ${pick.probabilidad_modelo}</p>
-              <p>💰 Cuota mínima: ${pick.cuota_minima}</p>
+              <p>💰 Cuota real: ${pick.cuota_real}</p>
 
               <h2 class="${color}">🔥 Value Score: ${pick.value_score}</h2>
 

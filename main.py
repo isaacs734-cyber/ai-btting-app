@@ -43,40 +43,34 @@ def players(search: str = "mbappe"):
 
     return resultados
 
-@app.get("/value-picks")
-def value_picks(search: str = "mbappe"):
-    jugadores = players(search)
+@app.get("/top-picks")
+def top_picks(min_value: float = 1.08, limit: int = 10):
+    busquedas = [
+        "a", "m", "r", "s", "b", "c",
+        "haaland", "mbappe", "cristiano", "messi",
+        "vinicius", "salah", "kane", "bellingham"
+    ]
 
-    picks = []
+    todos = []
 
-    for jugador in jugadores:
-        probabilidad = round(random.uniform(0.48, 0.76), 2)
-        cuota_real = round(random.uniform(1.55, 2.45), 2)
-        value_score = round(probabilidad * cuota_real, 2)
+    for nombre in busquedas:
+        picks = value_picks(nombre)
 
-        if value_score < 1.08:
-            continue
+        for pick in picks:
+            if pick["value_score"] >= min_value:
+                todos.append(pick)
 
-        if value_score >= 1.18:
-            confianza = "ALTA"
-            stake = "2%"
-        elif value_score >= 1.08:
-            confianza = "MEDIA"
-            stake = "1%"
-        else:
-            confianza = "BAJA"
-            stake = "NO BET"
+    # quitar duplicados por jugador
+    unicos = {}
+    for pick in todos:
+        jugador = pick["jugador"]
+        if jugador not in unicos or pick["value_score"] > unicos[jugador]["value_score"]:
+            unicos[jugador] = pick
 
-        picks.append({
-            "jugador": jugador["nombre"],
-            "equipo": jugador["equipo"],
-            "mercado": "Anota o asistencia",
-            "probabilidad_modelo": probabilidad,
-            "cuota_real": cuota_real,
-            "value_score": value_score,
-            "confianza": confianza,
-            "stake_recomendado": stake,
-            "nota": "Modelo dinámico inicial"
-        })
+    ordenados = sorted(
+        unicos.values(),
+        key=lambda x: x["value_score"],
+        reverse=True
+    )
 
-    return picks
+    return ordenados[:limit]
