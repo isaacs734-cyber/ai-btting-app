@@ -39,6 +39,30 @@ def debug():
         }
     except Exception as e:
         return {"error": str(e)}
+@app.get("/players")
+def players():
+    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
+
+    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
+
+    headers = {
+        "X-RapidAPI-Key": api_key,
+        "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+    data = response.json()
+
+    resultados = []
+
+    for item in data.get("response", {}).get("suggestions", [])[:10]:
+        resultados.append({
+            "nombre": item.get("name"),
+            "equipo": item.get("teamName"),
+            "tipo": item.get("type")
+        })
+
+    return resultados
 
 @app.get("/picks")
 def picks():
