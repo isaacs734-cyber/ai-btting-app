@@ -1,6 +1,10 @@
 from fastapi import FastAPI
+import requests
+import os
 
 app = FastAPI()
+
+API_KEY = os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17")
 
 @app.get("/")
 def home():
@@ -8,6 +12,22 @@ def home():
 
 @app.get("/picks")
 def picks():
-    return [
-        {"match": "Demo vs Demo", "prob": 0.7, "cuota": 1.8}
-    ]
+    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all"
+
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    partidos = []
+
+    for match in data.get("response", [])[:5]:
+        partidos.append({
+            "match": match["teams"]["home"]["name"] + " vs " + match["teams"]["away"]["name"],
+            "minuto": match["fixture"]["status"]["elapsed"]
+        })
+
+    return partidos
