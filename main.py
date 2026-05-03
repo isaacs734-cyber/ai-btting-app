@@ -65,23 +65,11 @@ def players(search: str = "m"):
     return resultados
 @app.get("/value-picks")
 def value_picks(search: str = "mbappe"):
-    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
-
-    url = f"https://free-api-live-football-data.p.rapidapi.com/football-players-search?search={search}"
-
-    headers = {
-        "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
-    }
-
-    response = requests.get(url, headers=headers, timeout=10)
-    data = response.json()
-
-    suggestions = data.get("response", {}).get("suggestions", [])
+    jugadores = players(search)
 
     picks = []
 
-    for item in suggestions[:10]:
+    for jugador in jugadores:
         probabilidad = 0.62
         cuota_minima = 1.80
         value_score = round(probabilidad * cuota_minima, 2)
@@ -97,8 +85,8 @@ def value_picks(search: str = "mbappe"):
             stake = "NO BET"
 
         picks.append({
-            "jugador": item.get("name"),
-            "equipo": item.get("teamName"),
+            "jugador": jugador.get("nombre"),
+            "equipo": jugador.get("equipo"),
             "mercado": "Anota o asistencia",
             "probabilidad_modelo": probabilidad,
             "cuota_minima": cuota_minima,
