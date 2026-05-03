@@ -4,7 +4,7 @@ import os
 
 app = FastAPI()
 
-API_KEY = os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17")
+API_KEY = os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17") or os.getenv("a62dd4ce99msha865405af45e6ffp1ccb6bjsnee9703603f17")
 
 @app.get("/")
 def home():
