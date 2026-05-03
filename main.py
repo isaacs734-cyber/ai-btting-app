@@ -63,6 +63,21 @@ def players(search: str = "m"):
         })
 
     return resultados
-@app.get("/picks")
-def picks():
-    return {"message": "Backend funcionando. Usa /debug para probar la API."}
+@app.get("/value-picks")
+def value_picks():
+    jugadores = players("messi")
+
+    picks = []
+
+    for jugador in jugadores:
+        picks.append({
+            "jugador": jugador["nombre"],
+            "equipo": jugador["equipo"],
+            "mercado": "Anota o asistencia",
+            "probabilidad_modelo": 0.62,
+            "cuota_minima": 1.80,
+            "confianza": "MEDIA",
+            "nota": "Demo inicial, falta conectar estadísticas reales"
+        })
+
+    return picks
