@@ -51,35 +51,32 @@ def value_picks(search: str = "mbappe"):
 
     for jugador in jugadores:
         probabilidad = round(random.uniform(0.48, 0.76), 2)
-cuota_real = round(random.uniform(1.55, 2.45), 2)
-value_score = round(probabilidad * cuota_real, 2)
+        cuota_real = round(random.uniform(1.55, 2.45), 2)
+        value_score = round(probabilidad * cuota_real, 2)
 
-if value_score >= 1.18:
-    confianza = "ALTA"
-    stake = "2%"
-elif value_score >= 1.08:
-    confianza = "MEDIA"
-    stake = "1%"
-else:
-    confianza = "BAJA"
-    stake = "NO BET"
+        if value_score < 1.08:
+            continue
 
-    if value_score < 1.08:
-    continue
-            picks.append({
-    "jugador": jugador["nombre"],
-    "equipo": jugador["equipo"],
-    "mercado": "Anota o asistencia",
+        if value_score >= 1.18:
+            confianza = "ALTA"
+            stake = "2%"
+        elif value_score >= 1.08:
+            confianza = "MEDIA"
+            stake = "1%"
+        else:
+            confianza = "BAJA"
+            stake = "NO BET"
 
-    "probabilidad_modelo": probabilidad,
-    "cuota_real": cuota_real,
-    "value_score": value_score,
-
-    "confianza": confianza,
-    "stake_recomendado": stake,
-
-    "nota": "Modelo dinámico inicial"
-})
+        picks.append({
+            "jugador": jugador["nombre"],
+            "equipo": jugador["equipo"],
+            "mercado": "Anota o asistencia",
+            "probabilidad_modelo": probabilidad,
+            "cuota_real": cuota_real,
+            "value_score": value_score,
+            "confianza": confianza,
+            "stake_recomendado": stake,
+            "nota": "Modelo dinámico inicial"
         })
 
     return picks
