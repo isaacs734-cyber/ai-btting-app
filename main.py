@@ -12,11 +12,12 @@ def home():
 
 @app.get("/debug")
 def debug():
-    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?date=2026-05-03"
+    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
 
-    headers = {
-        "X-RapidAPI-Key": API_KEY,
-        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+   headers = {
+    "X-RapidAPI-Key": API_KEY,
+    "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
+
     }
 
     response = requests.get(url, headers=headers)
