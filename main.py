@@ -85,3 +85,59 @@ def top_picks(min_value: float = 1.08, limit: int = 10):
     todos = sorted(todos, key=lambda x: x["value_score"], reverse=True)
 
     return todos[:limit]
+
+@app.get("/real-picks")
+def real_picks():
+    url = "https://odds-feed.p.rapidapi.com/markets"
+
+    querystring = {
+        "placing": "PREMATCH",
+        "market_name": "1X2",
+        "page": "0"
+    }
+
+    headers = {
+        "X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),
+        "X-RapidAPI-Host": "odds-feed.p.rapidapi.com"
+    }
+
+    res = requests.get(url, headers=headers, params=querystring)
+    data = res.json()
+
+    picks = []
+
+    # 🔥 IMPORTANTE: estructura puede variar, esto lo ajustamos después
+    for event in data.get("events", []):
+        for market in event.get("markets", []):
+            for outcome in market.get("outcomes", []):
+
+                cuota = float(outcome.get("odds", 0))
+
+                if cuota <= 1:
+                    continue
+
+                # modelo fake por ahora
+                probabilidad = round(1 / cuota * 1.1, 2)
+                value = round(probabilidad * cuota, 2)
+
+                if value < 1.08:
+                    continue
+
+                if value >= 1.18:
+                    confianza = "ALTA"
+                    stake = "2%"
+                else:
+                    confianza = "MEDIA"
+                    stake = "1%"
+
+                picks.append({
+                    "partido": event.get("name"),
+                    "seleccion": outcome.get("name"),
+                    "cuota_real": cuota,
+                    "probabilidad_modelo": probabilidad,
+                    "value_score": value,
+                    "confianza": confianza,
+                    "stake_recomendado": stake
+                })
+
+    return picks
