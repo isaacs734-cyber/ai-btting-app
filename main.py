@@ -12,7 +12,7 @@ def home():
 
 @app.get("/picks")
 def picks():
-    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all"
+    url = url = "https://api-football-v1.p.rapidapi.com/v3/fixtures?date=2026-05-03"
 
     headers = {
         "X-RapidAPI-Key": API_KEY,
