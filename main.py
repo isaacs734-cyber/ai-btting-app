@@ -12,13 +12,25 @@ def home():
 
 @app.get("/debug")
 def debug():
+    if not API_KEY:
+        return {"error": "API_KEY no está configurada en Railway"}
+
     url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
 
-   headers = {
-    "X-RapidAPI-Key": API_KEY,
-    "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
-
+    headers = {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
     }
 
-    response = requests.get(url, headers=headers)
-    return response.json()
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        return {
+            "status_code": response.status_code,
+            "data": response.json()
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/picks")
+def picks():
+    return {"message": "Backend funcionando. Usa /debug para probar la API."}
