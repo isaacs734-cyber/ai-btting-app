@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Value Bets</title>
+</head>
+<body style="font-family: Arial; background:#0f172a; color:white; text-align:center;">
+
+  <h1>🔥 Value Bets Finder</h1>
+
+  <input id="search" placeholder="Buscar jugador..." />
+  <button onclick="buscar()">Buscar</button>
+
+  <div id="results"></div>
+
+  <script>
+async function buscar() {
+    const search = document.getElementById("search").value;
+
+    const res = await fetch(`https://web-production-0b34d.up.railway.app/value-picks?search=${search}`);
+    const data = await res.json();
+
+    const resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = "";
+
+    if (data.length === 0) {
+        resultsDiv.innerHTML = "<p>No hay resultados</p>";
+        return;
+    }
+
+    data.forEach(pick => {
+        resultsDiv.innerHTML += `
+            <div style="margin:10px; padding:10px; border:1px solid white;">
+                <h3>${pick.jugador}</h3>
+                <p>Equipo: ${pick.equipo}</p>
+                <p>Mercado: ${pick.mercado}</p>
+                <p>Probabilidad: ${pick.probabilidad_modelo}</p>
+                <p>Cuota mínima: ${pick.cuota_minima}</p>
+                <p>Value Score: ${pick.value_score}</p>
+                <p>Confianza: ${pick.confianza}</p>
+            </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>
