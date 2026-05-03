@@ -65,7 +65,7 @@ def players(search: str = "m"):
     return resultados
 @app.get("/value-picks")
 def value_picks():
-    jugadores = players("messi")
+    jugadores = players("mbappe")
 
     picks = []
 
