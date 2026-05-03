@@ -1,47 +1,136 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Value Bets</title>
+  <title>Value Bets Finder</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px;
+      width: 250px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: none;
+      background: #22c55e;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .card {
+      background: #111827;
+      border-radius: 15px;
+      padding: 18px;
+      margin: 18px auto;
+      max-width: 420px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+      border: 1px solid #334155;
+    }
+
+    .value-high {
+      color: #22c55e;
+    }
+
+    .value-mid {
+      color: #facc15;
+    }
+
+    .value-low {
+      color: #ef4444;
+    }
+
+    .small {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial; background:#0f172a; color:white; text-align:center;">
+
+<body>
 
   <h1>🔥 Value Bets Finder</h1>
 
-  <input id="search" placeholder="Buscar jugador..." />
+  <input id="search" placeholder="Buscar jugador..." value="mbappe">
   <button onclick="buscar()">Buscar</button>
 
   <div id="results"></div>
 
   <script>
-async function buscar() {
-    const search = document.getElementById("search").value;
+    async function buscar() {
+      const search = document.getElementById("search").value;
+      const resultsDiv = document.getElementById("results");
 
-    const res = await fetch(`https://web-production-0b34d.up.railway.app/value-picks?search=${search}`);
-    const data = await res.json();
+      resultsDiv.innerHTML = "<p>Cargando picks...</p>";
 
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = "";
+      try {
+        const res = await fetch(`https://web-production-0b34d.up.railway.app/value-picks?search=${search}`, {
+          method: "GET"
+        });
 
-    if (data.length === 0) {
-        resultsDiv.innerHTML = "<p>No hay resultados</p>";
-        return;
-    }
+        const data = await res.json();
+        console.log(data);
 
-    data.forEach(pick => {
-        resultsDiv.innerHTML += `
-            <div style="margin:10px; padding:10px; border:1px solid white;">
-                <h3>${pick.jugador}</h3>
-                <p>Equipo: ${pick.equipo}</p>
-                <p>Mercado: ${pick.mercado}</p>
-                <p>Probabilidad: ${pick.probabilidad_modelo}</p>
-                <p>Cuota mínima: ${pick.cuota_minima}</p>
-                <p>Value Score: ${pick.value_score}</p>
-                <p>Confianza: ${pick.confianza}</p>
+        resultsDiv.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+          resultsDiv.innerHTML = "<p>No hay resultados</p>";
+          return;
+        }
+
+        data.forEach(pick => {
+          let color = "value-low";
+
+          if (pick.value_score > 1.1) {
+            color = "value-high";
+          } else if (pick.value_score > 1.0) {
+            color = "value-mid";
+          }
+
+          resultsDiv.innerHTML += `
+            <div class="card">
+              <h2>${pick.jugador}</h2>
+              <p class="small">${pick.equipo}</p>
+
+              <h3>${pick.mercado}</h3>
+
+              <p>📊 Probabilidad: ${pick.probabilidad_modelo}</p>
+              <p>💰 Cuota mínima: ${pick.cuota_minima}</p>
+
+              <h2 class="${color}">🔥 Value Score: ${pick.value_score}</h2>
+
+              <p>🎯 Confianza: ${pick.confianza}</p>
+              <p>💵 Stake recomendado: ${pick.stake_recomendado}</p>
+
+              <p class="small">${pick.nota}</p>
             </div>
-        `;
-    });
-}
-</script>
+          `;
+        });
+
+      } catch (error) {
+        resultsDiv.innerHTML = "<p>Error conectando con el backend</p>";
+        console.error(error);
+      }
+    }
+  </script>
 
 </body>
 </html>
