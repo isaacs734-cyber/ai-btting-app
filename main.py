@@ -1,8 +1,10 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 import os
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -10,43 +12,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.get("/")
 def home():
     return {"status": "ok"}
 
-@app.get("/envcheck")
-def envcheck():
-    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
-
-    return {
-        "api_key_detectada": bool(api_key),
-        "variables_api": [k for k in os.environ.keys() if "API" in k or "KEY" in k]
-    }
-
-@app.get("/debug")
-def debug():
-    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
-
-    if not api_key:
-        return {"error": "API_KEY no está configurada en Railway"}
-
-    url = "https://free-api-live-football-data.p.rapidapi.com/football-players-search?search=m"
-
-    headers = {
-        "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
-    }
-
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        return {
-            "status_code": response.status_code,
-            "data": response.json()
-        }
-    except Exception as e:
-        return {"error": str(e)}
 @app.get("/players")
-def players(search: str = "m"):
+def players(search: str = "mbappe"):
     api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
 
     url = f"https://free-api-live-football-data.p.rapidapi.com/football-players-search?search={search}"
@@ -69,6 +41,7 @@ def players(search: str = "m"):
         })
 
     return resultados
+
 @app.get("/value-picks")
 def value_picks(search: str = "mbappe"):
     jugadores = players(search)
@@ -80,16 +53,6 @@ def value_picks(search: str = "mbappe"):
         cuota_minima = 1.80
         value_score = round(probabilidad * cuota_minima, 2)
 
-        if value_score >= 1.15:
-            confianza = "ALTA"
-            stake = "2%"
-        elif value_score >= 1.05:
-            confianza = "MEDIA"
-            stake = "1%"
-        else:
-            confianza = "BAJA"
-            stake = "NO BET"
-
         picks.append({
             "jugador": jugador.get("nombre"),
             "equipo": jugador.get("equipo"),
@@ -97,8 +60,8 @@ def value_picks(search: str = "mbappe"):
             "probabilidad_modelo": probabilidad,
             "cuota_minima": cuota_minima,
             "value_score": value_score,
-            "confianza": confianza,
-            "stake_recomendado": stake,
+            "confianza": "MEDIA",
+            "stake_recomendado": "1%",
             "nota": "Demo trader inicial. Falta conectar stats reales y cuotas reales."
         })
 
