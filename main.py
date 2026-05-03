@@ -65,26 +65,47 @@ def players(search: str = "m"):
     return resultados
 @app.get("/value-picks")
 def value_picks(search: str = "mbappe"):
-    jugadores = players(search)
+    api_key = (os.getenv("API_KEY") or os.getenv("RAPIDAPI_KEY") or "").strip()
 
-    if not jugadores:
-        return {
-            "error": "No se encontraron jugadores",
-            "busqueda": search,
-            "tip": "Prueba /players?search=mbappe"
-        }
+    url = f"https://free-api-live-football-data.p.rapidapi.com/football-players-search?search={search}"
+
+    headers = {
+        "X-RapidAPI-Key": api_key,
+        "X-RapidAPI-Host": "free-api-live-football-data.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+    data = response.json()
+
+    suggestions = data.get("response", {}).get("suggestions", [])
 
     picks = []
 
-    for jugador in jugadores:
+    for item in suggestions[:10]:
+        probabilidad = 0.62
+        cuota_minima = 1.80
+        value_score = round(probabilidad * cuota_minima, 2)
+
+        if value_score >= 1.15:
+            confianza = "ALTA"
+            stake = "2%"
+        elif value_score >= 1.05:
+            confianza = "MEDIA"
+            stake = "1%"
+        else:
+            confianza = "BAJA"
+            stake = "NO BET"
+
         picks.append({
-            "jugador": jugador["nombre"],
-            "equipo": jugador["equipo"],
+            "jugador": item.get("name"),
+            "equipo": item.get("teamName"),
             "mercado": "Anota o asistencia",
-            "probabilidad_modelo": 0.62,
-            "cuota_minima": 1.80,
-            "confianza": "MEDIA",
-            "nota": "Demo inicial, falta conectar estadísticas reales"
+            "probabilidad_modelo": probabilidad,
+            "cuota_minima": cuota_minima,
+            "value_score": value_score,
+            "confianza": confianza,
+            "stake_recomendado": stake,
+            "nota": "Demo trader inicial. Falta conectar stats reales y cuotas reales."
         })
 
     return picks
