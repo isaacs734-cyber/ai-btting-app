@@ -150,7 +150,7 @@ def real_picks():
     if not api_key:
         return {"error": "ODDS_API_KEY no está configurada"}
 
-    sport_key = "soccer_mexico_ligamx"
+    sport_key = "soccer_epl"
 
     url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/"
 
@@ -165,5 +165,5 @@ def real_picks():
 
     return {
         "status_code": response.status_code,
-        "data": response.json()
+        "data": data
     }
