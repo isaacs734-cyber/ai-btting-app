@@ -167,3 +167,22 @@ def real_picks():
         "status_code": response.status_code,
         "data": data
     }
+@app.get("/sports-test")
+def sports_test():
+    api_key = os.getenv("ODDS_API_KEY")
+
+    if not api_key:
+        return {"error": "ODDS_API_KEY no está configurada"}
+
+    url = "https://api.the-odds-api.com/v4/sports/"
+
+    params = {
+        "apiKey": api_key
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+
+    return {
+        "status_code": response.status_code,
+        "data": response.json()
+    }
