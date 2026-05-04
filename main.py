@@ -32,6 +32,8 @@ def players(search: str = "mbappe"):
     response = requests.get(url, headers=headers, timeout=10)
     data = response.json()
 
+print (data)
+
     resultados = []
 
     for item in data.get("response", {}).get("suggestions", [])[:10]:
