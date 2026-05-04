@@ -32,7 +32,7 @@ def players(search: str = "mbappe"):
     response = requests.get(url, headers=headers, timeout=10)
     data = response.json()
 
-print (data)
+    print (data)
 
     resultados = []
 
