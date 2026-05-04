@@ -145,21 +145,44 @@ def real_picks():
     return picks
 @app.get("/real-picks")
 def real_picks():
-    url = "https://odds-feed.p.rapidapi.com/markets"
+    api_key = os.getenv("ODDS_API_KEY")
 
-    querystring = {
-        "placing": "PREMATCH",
-        "page": "0"
+    url = "https://api.the-odds-api.com/v4/sports/soccer/odds/"
+
+    params = {
+        "apiKey": api_key,
+        "regions": "eu",   # casas de apuestas europeas (mejores odds)
+        "markets": "h2h",  # 1X2
+        "oddsFormat": "decimal"
     }
 
-    headers = {
-        "X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),
-        "X-RapidAPI-Host": "odds-feed.p.rapidapi.com"
-    }
-
-    response = requests.get(url, headers=headers, params=querystring)
+    response = requests.get(url, params=params)
     data = response.json()
 
     print(data)
 
-    return data
+    picks = []
+
+    for game in data:
+        home = game.get("home_team")
+        away = game.get("away_team")
+
+        bookmakers = game.get("bookmakers", [])
+
+        if not bookmakers:
+            continue
+
+        markets = bookmakers[0].get("markets", [])
+        if not markets:
+            continue
+
+        outcomes = markets[0].get("outcomes", [])
+
+        odds = {o["name"]: o["price"] for o in outcomes}
+
+        picks.append({
+            "match": f"{home} vs {away}",
+            "odds": odds
+        })
+
+    return picks
