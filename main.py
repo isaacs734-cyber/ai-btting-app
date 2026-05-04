@@ -143,3 +143,24 @@ def real_picks():
                 })
 
     return picks
+@app.get("/real-picks")
+def real_picks():
+    url = "https://odds-feed.p.rapidapi.com/markets"
+
+    querystring = {
+        "placing": "LIVE",
+        "market_name": "1X2",
+        "page": "0"
+    }
+
+    headers = {
+        "X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),
+        "X-RapidAPI-Host": "odds-feed.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+    data = response.json()
+
+    print(data)
+
+    return data
