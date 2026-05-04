@@ -147,42 +147,23 @@ def real_picks():
 def real_picks():
     api_key = os.getenv("ODDS_API_KEY")
 
-    url = "https://api.the-odds-api.com/v4/sports/soccer/odds/"
+    if not api_key:
+        return {"error": "ODDS_API_KEY no está configurada"}
+
+    sport_key = "soccer_mexico_ligamx"
+
+    url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/"
 
     params = {
         "apiKey": api_key,
-        "regions": "eu",   # casas de apuestas europeas (mejores odds)
-        "markets": "h2h",  # 1X2
+        "regions": "us,eu",
+        "markets": "h2h",
         "oddsFormat": "decimal"
     }
 
-    response = requests.get(url, params=params)
-    data = response.json()
+    response = requests.get(url, params=params, timeout=10)
 
-    print(data)
-
-    picks = []
-
-    for game in data:
-        home = game.get("home_team")
-        away = game.get("away_team")
-
-        bookmakers = game.get("bookmakers", [])
-
-        if not bookmakers:
-            continue
-
-        markets = bookmakers[0].get("markets", [])
-        if not markets:
-            continue
-
-        outcomes = markets[0].get("outcomes", [])
-
-        odds = {o["name"]: o["price"] for o in outcomes}
-
-        picks.append({
-            "match": f"{home} vs {away}",
-            "odds": odds
-        })
-
-    return picks
+    return {
+        "status_code": response.status_code,
+        "data": response.json()
+    }
