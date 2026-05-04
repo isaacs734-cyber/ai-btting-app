@@ -148,8 +148,7 @@ def real_picks():
     url = "https://odds-feed.p.rapidapi.com/markets"
 
     querystring = {
-        "placing": "LIVE",
-        "market_name": "1X2",
+        "placing": "PREMATCH",
         "page": "0"
     }
 
