@@ -143,30 +143,27 @@ def real_picks():
                 })
 
     return picks
-@app.get("/real-picks")
-def real_picks():
+
+@app.get("/sports-test")
+def sports_test():
     api_key = os.getenv("ODDS_API_KEY")
 
     if not api_key:
         return {"error": "ODDS_API_KEY no está configurada"}
 
-    sport_key = "soccer_argentina_primera_division"
-
-    url = f"https://api.the-odds-api.com/v4/sports/{sport_key}/odds/"
+    url = "https://api.the-odds-api.com/v4/sports/"
 
     params = {
-        "apiKey": api_key,
-        "regions": "us,eu",
-        "markets": "h2h",
-        "oddsFormat": "decimal"
+        "apiKey": api_key
     }
 
     response = requests.get(url, params=params, timeout=10)
-return data
+
     return {
         "status_code": response.status_code,
-        "data": data
+        "data": response.json()
     }
+
 @app.get("/sports-test")
 def sports_test():
     api_key = os.getenv("ODDS_API_KEY")
