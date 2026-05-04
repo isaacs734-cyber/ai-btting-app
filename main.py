@@ -162,7 +162,7 @@ def real_picks():
     }
 
     response = requests.get(url, params=params, timeout=10)
-
+return data
     return {
         "status_code": response.status_code,
         "data": data
